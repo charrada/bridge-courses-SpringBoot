@@ -7,6 +7,7 @@ import project.entities.Course;
 import project.repositories.CourseRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -41,6 +42,10 @@ public class ServicesImpl implements IServices {
     }
 
 
-
+    @Override
+    public Course getCourseById(int courseId) {
+        Optional<Course> optionalCourse = courseRepository.findById(courseId);
+        return optionalCourse.orElse(null);
+    }
 
 }

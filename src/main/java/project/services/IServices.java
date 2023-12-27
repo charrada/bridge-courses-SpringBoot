@@ -17,4 +17,5 @@ public interface IServices {
 
     public List<Course> getAllCourses();
 
+   public Course getCourseById(int courseId);
 }

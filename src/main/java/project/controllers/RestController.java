@@ -38,7 +38,10 @@ public class RestController {
 
 
 
-
+    @GetMapping("/getCourseById/{courseId}")
+    public Course getCourseById(@PathVariable int courseId) {
+        return services.getCourseById(courseId);
+    }
 
 
 }
