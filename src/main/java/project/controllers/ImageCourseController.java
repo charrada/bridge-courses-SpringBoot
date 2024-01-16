@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import project.entities.ImageCourse;
 import project.repositories.ImageCourseRepository;
 
+import javax.transaction.Transactional;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Optional;
@@ -25,7 +26,7 @@ public class ImageCourseController {
     ImageCourseRepository imageRepository;
 
     @PostMapping("/upload")
-    public ResponseEntity<ImageCourse> uploadPDP(@RequestParam("imageFile") MultipartFile file, @RequestParam("idCourse") int idCourse) {
+    public ResponseEntity<ImageCourse> uploadImage(@RequestParam("imageFile") MultipartFile file, @RequestParam("idCourse") int idCourse) {
         try {
             System.out.println("Original Image Byte Size - " + file.getBytes().length);
             ImageCourse img = new ImageCourse();
@@ -43,7 +44,7 @@ public class ImageCourseController {
     
 
     @GetMapping(path = { "/get/{idCourse}" })
-    public ResponseEntity<ImageCourse> getPDPByIdCourse(@PathVariable("idCourse") int idCourse) {
+    public ResponseEntity<ImageCourse> getImageByIdCourse(@PathVariable("idCourse") int idCourse) {
         final Optional<ImageCourse> retrievedImage = imageRepository.findByIdCourse(idCourse);
         if (retrievedImage.isPresent()) {
             ImageCourse img = retrievedImage.get();
@@ -53,6 +54,48 @@ public class ImageCourseController {
             return ResponseEntity.notFound().build();
         }
     }
+
+
+    @DeleteMapping("/delete/{idCourse}")
+    @Transactional  // Add this annotation to enable transaction management
+    public ResponseEntity<String> deleteImageByIdCourse(@PathVariable("idCourse") int idCourse) {
+        try {
+            imageRepository.deleteByIdCourse(idCourse);
+            return ResponseEntity.ok("Image deleted successfully");
+        } catch (Exception e) {
+            // Log the exception for further investigation
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting image");
+        }
+    }
+
+
+    @PutMapping("/update/{idCourse}")
+    @Transactional
+    public ResponseEntity<ImageCourse> updateImage(
+            @RequestParam("imageFile") MultipartFile file,
+            @PathVariable("idCourse") int idCourse) {
+        try {
+            // Delete the existing image
+            imageRepository.deleteByIdCourse(idCourse);
+
+            // Upload the new image
+            ImageCourse img = new ImageCourse();
+            img.setName(file.getOriginalFilename());
+            img.setType(file.getContentType());
+            img.setPicByte(compressBytes(file.getBytes()));
+            img.setIdCourse(idCourse);
+            imageRepository.save(img);
+
+            return ResponseEntity.ok(img);
+        } catch (IOException e) {
+            // Log the exception for further investigation
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+
 
     // compress the image bytes before storing it in the database
     public static byte[] compressBytes(byte[] data) {

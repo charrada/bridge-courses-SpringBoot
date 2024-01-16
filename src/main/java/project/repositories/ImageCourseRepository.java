@@ -11,6 +11,8 @@ public interface ImageCourseRepository extends JpaRepository<ImageCourse, Long> 
     Optional<ImageCourse> findById(Long id);
 
     Optional<ImageCourse> findByIdCourse(int idCourse);
+
+    void deleteByIdCourse(int idCourse);
 }
 
 
