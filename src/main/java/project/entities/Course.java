@@ -21,7 +21,6 @@ public class Course implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int idCourse;
     String nameCourse;
-    String imageCourse;
     String description;
     float price;
 
